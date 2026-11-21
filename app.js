@@ -1,3 +1,5 @@
+const DEFAULT_API_KEY = "AQ.Ab8RN6KU0Z6CQCqxRjn3WeYrb5yIOm0ol8hXlHlUa4FfGUqp-A";
+
 /**
  * CivicResolve - Single-Page Application Logic
  * Modern municipal complaint triage powered by Google Gemini API & localStorage
@@ -639,7 +641,7 @@ function saveComplaints(complaints) {
 }
 
 function getStoredApiKey() {
-  return localStorage.getItem(STORAGE_API_KEY) || '';
+  return localStorage.getItem(STORAGE_API_KEY) || (DEFAULT_API_KEY.indexOf('PASTE') === 0 ? '' : DEFAULT_API_KEY);
 }
 
 function getStoredModel() {
