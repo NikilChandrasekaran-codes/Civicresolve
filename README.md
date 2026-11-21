@@ -1,49 +1,39 @@
-# CivicResolve 🏛️
-**AI-Powered Municipal Issue Resolution & Triage Platform**
+# CivicResolve - AI-Powered Civic Issue Reporting Platform
 
-CivicResolve is a modern single-page web application (HTML5, CSS3, JavaScript) that empowers citizens to report urban infrastructure issues and enables city administrators to review, prioritize, and dispatch municipal services.
+Live demo: https://nikilchandrasekaran-codes.github.io/Civicresolve/
 
----
+## The Problem
+Everyday civic issues like potholes, overflowing garbage, broken streetlights and water leaks affect communities, but reporting them is confusing. Citizens often do not know which department to contact or how to describe the problem, and they cannot see what happens after they report it. Authorities receive unstructured complaints that are hard to sort and prioritize.
 
-## 🌟 Key Features
+## What CivicResolve Does
+CivicResolve lets citizens report an issue with a title, description, location and an optional photo. Google Gemini then reads the complaint and automatically gives:
+- the issue category
+- a priority level (Low, Medium, High, Critical) with a one-line reason
+- the recommended department
 
-### 👤 Citizen Portal
-- **Smart Complaint Reporting**: Submit issues with Title, Category, Location (manual or 1-click GPS detection), Description, and optional Photo Evidence (with drag-and-drop & live thumbnail preview).
-- **Gemini AI Auto-Triage**: Sends newly submitted complaints to Google's Gemini API with structured JSON output:
-  - **Category**: Verified municipal category.
-  - **Priority Score**: `Low`, `Medium`, `High`, or `Critical`.
-  - **AI Justification**: A concise one-line public safety and risk rationale.
-  - **Recommended Department**: Auto-routes to the appropriate municipal entity (e.g. *Department of Public Works*, *Water & Sewer Authority*, *Bureau of Street Lighting*).
-- **AI Triage Spotlight Card**: Prominently highlights the real-time AI evaluation and department recommendation right after submission or upon clicking any complaint.
-- **My Submitted Complaints Feed**: Filterable by status (`Reported`, `In Progress`, `Resolved`) with timestamps, badges, and department tags.
+Citizens can track each complaint through a status timeline (Reported, In Progress, Resolved). An admin dashboard lets officials search and filter complaints, update statuses, and see live counts by status and priority.
 
-### 🛡️ Admin Dispatcher Hub
-- **Executive Metric Counters**: Real-time count badges for:
-  - Total Complaints
-  - Status Breakdown: `Reported`, `In Progress`, `Resolved`
-  - Priority Breakdown: `Critical`, `High`, `Medium`, `Low`
-- **Instant Status Management**: Change the status of any complaint via an inline dropdown; updates the state, counters, and `localStorage` in real-time.
-- **Live Search & Multi-Filters**: Filter by status, priority, or search by keyword, landmark, or department.
-- **Detailed Inspection Modal**: View full-resolution photos, issue logs, and AI reasoning.
-- **Data Export & Reset**: Export records to JSON or restore default sample data at any time.
+## How It Solves the Problem
+- Citizens no longer need to know which department to approach, because the AI routes the complaint.
+- Urgent cases such as a collapsing bridge are marked Critical, while routine ones stay lower, so authorities can act on the most dangerous issues first.
+- The status timeline makes progress visible and transparent.
+- If Gemini is busy, the app retries automatically and switches to a lighter model, so reporting keeps working.
 
-### ⚙️ Gemini API Configuration
-- **Privacy-First**: Your Gemini API key is stored strictly inside `localStorage` in your browser. It is **never** hardcoded or sent to any server other than Google Generative Language endpoints.
-- **Key Testing Tool**: In-modal connection verification to test your key against `gemini-flash-lite-latest` (default), `gemini-flash-latest`, `gemini-pro-latest`, or `gemini-2.5-flash`. Includes 30s timeout, 3x automated retries (2s, 4s, 8s backoff on 503/429/timeout), and automatic fallback model switching. Displays exact URL (with API key masked as `**`), model name, and full error text with zero console key leakage.
-- **Graceful Error Handling**: If no API key is provided or if network/quota issues occur, CivicResolve displays a friendly error banner and applies intelligent fallback heuristics so citizen reports are never lost.
+## How I Built It
+I built this as a solo vibe coding project in one day. I described the app in plain English to Google Antigravity, which generated the HTML, CSS and JavaScript, then tested and improved it step by step. Gemini is called through the Gemini API for classification, priority and department routing. Data is saved in the browser (localStorage and IndexedDB), so no backend is needed. The app is hosted with GitHub Pages.
 
-### 📦 Pre-loaded Sample Complaints
-Includes 5 pre-configured sample complaints with realistic SVG illustrations and varied statuses:
-1. 🕳️ **Pothole** (*Main St & 5th Ave*) — High Priority, *In Progress*
-2. 🗑️ **Overflowing Garbage** (*Central Market Back Alley*) — Medium Priority, *Reported*
-3. 💡 **Broken Streetlight** (*Westside Elementary School*) — Medium Priority, *In Progress*
-4. 💧 **Water Leak** (*240 Grand Ave*) — Critical Priority, *Reported*
-5. 🛣️ **Damaged Road** (*Riverbank Way*) — Low Priority, *Resolved*
+## Try It (no setup)
+1. Open the live demo. The top should say "Gemini: Active".
+2. In Citizen Portal, submit a complaint (add a photo if you like).
+3. See the AI category, priority, reason and department.
+4. Open Admin Dashboard, change the status, and watch the timeline update.
 
----
+Tip: compare "Streetlight not working near school" (Medium) with "Bridge about to collapse" (Critical).
 
-## 🚀 How to Run
+## Note on the API Key
+The demo uses a free, limited key made only for judging. It will be deleted after the results.
 
-1. Open `index.html` directly in any web browser (Chrome, Edge, Firefox, Safari).
-2. Click the **Gear icon** in the top right to paste your free Gemini API key from [Google AI Studio](https://aistudio.google.com/app/apikey).
-3. Switch between **Citizen Portal** and **Admin Dashboard** using the navigation pill at the top.
+## Tech Stack
+HTML, CSS, JavaScript, Google Gemini API, Google Antigravity, GitHub Pages
+
+Built by Nikil Chandrasekaran
