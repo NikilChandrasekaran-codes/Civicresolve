@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CivicResolve - AI-Powered Municipal Issue Resolution</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- App Header / Navigation -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-logo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21h18"/>
+            <path d="M5 21V7l7-4 7 4v14"/>
+            <path d="M9 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
+            <path d="M9 21v-5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v5"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">Civic<span>Resolve</span></span>
+          <span class="brand-tagline">AI Municipal Triage & Resolution</span>
+        </div>
+      </div>
+
+      <!-- Center View Switcher -->
+      <nav class="view-switcher" role="tablist" aria-label="Portal Mode">
+        <button id="view-citizen-btn" class="nav-btn active" role="tab" aria-selected="true" onclick="switchView('citizen')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          <span>Citizen Portal</span>
+        </button>
+        <button id="view-admin-btn" class="nav-btn" role="tab" aria-selected="false" onclick="switchView('admin')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="18" height="18" x="3" y="3" rx="2"/>
+            <path d="M3 9h18"/>
+            <path d="M9 21V9"/>
+          </svg>
+          <span>Admin Dashboard</span>
+          <span id="admin-badge-count" class="badge-pill">5</span>
+        </button>
+      </nav>
+
+      <!-- Right Header Actions -->
+      <div class="header-actions">
+        <div id="api-status-badge" class="api-status-pill unconfigured" onclick="openSettingsModal()" title="Click to configure Gemini API Key">
+          <span class="status-dot"></span>
+          <span id="api-status-text">Gemini: Not Configured</span>
+        </div>
+        <button class="icon-btn" onclick="openSettingsModal()" title="Gemini API & System Settings" aria-label="Settings">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Banner for Missing API Key (friendly reminder) -->
+  <aside id="api-reminder-banner" class="notification-banner">
+    <div class="banner-content">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
+      </svg>
+      <span><strong>Gemini API Key Required:</strong> To enable instant AI classification, priority scoring, and department routing, paste your API key in Settings.</span>
+    </div>
+    <button class="banner-btn" onclick="openSettingsModal()">Enter Key</button>
+  </aside>
+
+  <!-- Main Application Container -->
+  <main class="main-content">
+
+    <!-- ==================================================== -->
+    <!-- CITIZEN VIEW                                         -->
+    <!-- ==================================================== -->
+    <section id="citizen-view" class="view-section active">
+      <div class="hero-stripe">
+        <div class="hero-text">
+          <h1>Report Civic Issues Directly to City Officials</h1>
+          <p>Submit infrastructure, sanitation, road, or utility defects. Our Gemini-powered municipal engine automatically assesses priority, verifies urgency, and routes your report to the right department.</p>
+        </div>
+        <div class="hero-stats-pill">
+          <div class="stat-item">
+            <span class="stat-number" id="citizen-total-count">5</span>
+            <span class="stat-label">Total Reports</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-number text-success" id="citizen-resolved-count">1</span>
+            <span class="stat-label">Resolved</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="citizen-layout">
+        <!-- Left: Form Column -->
+        <div class="citizen-form-column">
+          <div class="card form-card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <div class="card-icon-badge bg-primary-soft">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                </div>
+                <div>
+                  <h2>Submit a Complaint</h2>
+                  <p class="card-subtitle">Provide details for automated city evaluation</p>
+                </div>
+              </div>
+            </div>
+
+            <form id="complaint-form" onsubmit="handleComplaintSubmit(event)">
+              <!-- Title -->
+              <div class="form-group">
+                <label for="comp-title">Complaint Title <span class="required">*</span></label>
+                <input 
+                  type="text" 
+                  id="comp-title" 
+                  placeholder="e.g. Hazardous deep pothole on Main Street" 
+                  required 
+                  maxlength="120"
+                >
+              </div>
+
+              <!-- Category & Location Row -->
+              <div class="form-row">
+                <div class="form-group flex-1">
+                  <label for="comp-category">Primary Category <span class="required">*</span></label>
+                  <select id="comp-category" required>
+                    <option value="" disabled selected>Select issue category</option>
+                    <option value="Roads & Infrastructure">Roads & Infrastructure</option>
+                    <option value="Sanitation & Waste">Sanitation & Waste</option>
+                    <option value="Street Lighting">Street Lighting</option>
+                    <option value="Water & Sewage">Water & Sewage</option>
+                    <option value="Public Safety">Public Safety</option>
+                    <option value="Parks & Recreation">Parks & Recreation</option>
+                    <option value="Traffic & Transit">Traffic & Transit</option>
+                    <option value="Other">Other Civic Issue</option>
+                  </select>
+                </div>
+
+                <div class="form-group flex-1">
+                  <label for="comp-location">Location / Landmark <span class="required">*</span></label>
+                  <div class="input-with-button">
+                    <input 
+                      type="text" 
+                      id="comp-location" 
+                      placeholder="e.g. 5th Ave & Pine St crossing" 
+                      required
+                    >
+                    <button type="button" class="inline-btn" onclick="detectUserLocation()" title="Use GPS Location">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="2" y1="12" x2="22" y2="12"/>
+                        <line x1="12" y1="2" x2="12" y2="22"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Description -->
+              <div class="form-group">
+                <label for="comp-description">Detailed Description <span class="required">*</span></label>
+                <textarea 
+                  id="comp-description" 
+                  rows="3" 
+                  placeholder="Describe the issue, hazards, duration, and any immediate impact on pedestrians, traffic or residents..." 
+                  required
+                ></textarea>
+              </div>
+
+              <!-- Optional Image Upload -->
+              <div class="form-group">
+                <label>Photo Evidence <span class="text-muted">(Optional)</span></label>
+                <div class="upload-dropzone" id="upload-dropzone">
+                  <input type="file" id="comp-image" accept="image/*" onchange="handleImageSelection(event)">
+                  <div class="dropzone-content" id="dropzone-placeholder">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                      <circle cx="9" cy="9" r="2"/>
+                      <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                    </svg>
+                    <p class="dropzone-text"><strong>Click to browse</strong> or drag & drop photo here</p>
+                    <span class="dropzone-hint">PNG, JPG, WebP up to 5MB</span>
+                  </div>
+                  <!-- Image Preview Container -->
+                  <div class="image-preview-container hidden" id="image-preview-container">
+                    <img id="image-preview" src="" alt="Complaint photo preview">
+                    <button type="button" class="remove-image-btn" onclick="removeSelectedImage()" title="Remove image">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="form-actions">
+                <button type="submit" id="submit-btn" class="btn btn-primary btn-block">
+                  <span class="btn-spinner hidden" id="submit-spinner"></span>
+                  <svg id="submit-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"/>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                  </svg>
+                  <span id="submit-btn-text">Submit & Analyze with Gemini</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Right: Results & Citizen Complaint Feed -->
+        <div class="citizen-feed-column">
+          <!-- Latest AI Result Spotlight Card (Dynamically updated) -->
+          <div id="ai-spotlight-card" class="card ai-spotlight-card">
+            <div class="spotlight-header">
+              <div class="spotlight-title">
+                <span class="ai-chip">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                  </svg>
+                  Gemini AI Triage Assessment
+                </span>
+                <span class="spotlight-status" id="spotlight-timestamp">Live Evaluation</span>
+              </div>
+            </div>
+            
+            <div id="spotlight-body" class="spotlight-body">
+              <div class="spotlight-welcome">
+                <p>Submit a new complaint or select an existing one below to inspect Gemini's priority rating, public safety reason, and department assignment.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Citizen Complaints List Header & Filter -->
+          <div class="feed-header-wrapper">
+            <div class="feed-title-wrap">
+              <h3>My Submitted Complaints</h3>
+              <p>Track live municipal statuses and AI recommended routing</p>
+            </div>
+            <div class="feed-filters">
+              <select id="citizen-filter-status" onchange="renderCitizenComplaints()">
+                <option value="ALL">All Statuses</option>
+                <option value="Reported">Reported</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Resolved">Resolved</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Complaint Cards Feed -->
+          <div id="citizen-complaints-list" class="complaints-feed">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================== -->
+    <!-- ADMIN VIEW                                           -->
+    <!-- ==================================================== -->
+    <section id="admin-view" class="view-section">
+      <div class="admin-header-row">
+        <div>
+          <h1>Municipal Dispatcher & Admin Hub</h1>
+          <p>Oversee city complaints, adjust resolution statuses, and view priority triage metrics.</p>
+        </div>
+        <div class="admin-quick-actions">
+          <button class="btn btn-secondary" onclick="exportComplaintsData()" title="Export JSON">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Export Data
+          </button>
+          <button class="btn btn-outline" onclick="openResetModal()" title="Reset to sample complaints">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+              <path d="M3 3v5h5"/>
+            </svg>
+            Reset Samples
+          </button>
+        </div>
+      </div>
+
+      <!-- Metric Counts Overview Cards -->
+      <div class="metrics-grid">
+        <!-- Status Counts -->
+        <div class="metric-card metric-total">
+          <div class="metric-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+          </div>
+          <div class="metric-info">
+            <span class="metric-label">Total Complaints</span>
+            <span class="metric-value" id="admin-count-total">0</span>
+          </div>
+        </div>
+
+        <div class="metric-card metric-reported">
+          <div class="metric-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </div>
+          <div class="metric-info">
+            <span class="metric-label">Reported</span>
+            <span class="metric-value" id="admin-count-reported">0</span>
+          </div>
+        </div>
+
+        <div class="metric-card metric-progress">
+          <div class="metric-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="10" y1="2" x2="14" y2="2"/>
+              <line x1="12" y1="14" x2="15" y2="11"/>
+              <circle cx="12" cy="14" r="8"/>
+            </svg>
+          </div>
+          <div class="metric-info">
+            <span class="metric-label">In Progress</span>
+            <span class="metric-value" id="admin-count-progress">0</span>
+          </div>
+        </div>
+
+        <div class="metric-card metric-resolved">
+          <div class="metric-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+          </div>
+          <div class="metric-info">
+            <span class="metric-label">Resolved</span>
+            <span class="metric-value" id="admin-count-resolved">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Priority Distribution Bar & Counters -->
+      <div class="priority-overview-card">
+        <div class="priority-header">
+          <h3>Complaints by AI Priority Level</h3>
+          <span class="text-muted">Calculated automatically via Gemini assessment</span>
+        </div>
+        <div class="priority-stats-row">
+          <div class="priority-pill-stat critical" onclick="filterAdminByPriority('Critical')">
+            <span class="priority-tag">Critical</span>
+            <span class="priority-num" id="admin-prio-critical">0</span>
+          </div>
+          <div class="priority-pill-stat high" onclick="filterAdminByPriority('High')">
+            <span class="priority-tag">High</span>
+            <span class="priority-num" id="admin-prio-high">0</span>
+          </div>
+          <div class="priority-pill-stat medium" onclick="filterAdminByPriority('Medium')">
+            <span class="priority-tag">Medium</span>
+            <span class="priority-num" id="admin-prio-medium">0</span>
+          </div>
+          <div class="priority-pill-stat low" onclick="filterAdminByPriority('Low')">
+            <span class="priority-tag">Low</span>
+            <span class="priority-num" id="admin-prio-low">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin Filter / Controls Bar -->
+      <div class="admin-toolbar">
+        <div class="search-input-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input 
+            type="text" 
+            id="admin-search-input" 
+            placeholder="Search by title, location, department, or keyword..." 
+            oninput="renderAdminComplaints()"
+          >
+        </div>
+
+        <div class="toolbar-filters">
+          <div class="filter-group">
+            <label for="admin-filter-status">Status:</label>
+            <select id="admin-filter-status" onchange="renderAdminComplaints()">
+              <option value="ALL">All Statuses</option>
+              <option value="Reported">Reported</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Resolved">Resolved</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="admin-filter-priority">Priority:</label>
+            <select id="admin-filter-priority" onchange="renderAdminComplaints()">
+              <option value="ALL">All Priorities</option>
+              <option value="Critical">Critical</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin Complaints Table / Cards -->
+      <div class="admin-table-container">
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Issue & Location</th>
+                <th>Category</th>
+                <th>AI Priority & Reason</th>
+                <th>Recommended Dept</th>
+                <th>Status (Change)</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-complaints-tbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+        <div id="admin-empty-state" class="empty-state hidden">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <h4>No complaints found</h4>
+          <p>No reports match your current filter or search criteria.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================================================== -->
+  <!-- SETTINGS MODAL (Gemini API Key & Configuration)     -->
+  <!-- ==================================================== -->
+  <div id="settings-modal" class="modal-backdrop hidden" onclick="handleModalBackdropClick(event, 'settings-modal')">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon-badge">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            </svg>
+          </div>
+          <div>
+            <h3>Gemini API Configuration</h3>
+            <p>Manage your Google Gemini API key securely</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" onclick="closeSettingsModal()" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="settings-callout">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          <div>
+            <strong>Strict Privacy Guarantee:</strong> Your Gemini API key is stored strictly inside your browser's <code>localStorage</code>. It is never sent to any server other than official Google AI endpoints.
+          </div>
+        </div>
+
+        <form id="settings-form" onsubmit="saveApiKey(event)">
+          <div class="form-group">
+            <label for="gemini-api-key">Gemini API Key</label>
+            <div class="password-input-wrap">
+              <input 
+                type="password" 
+                id="gemini-api-key" 
+                placeholder="AIzaSy..." 
+                autocomplete="off"
+                spellcheck="false"
+              >
+              <button type="button" class="eye-toggle-btn" onclick="toggleApiKeyVisibility()" title="Toggle visibility">
+                <svg id="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+            <span class="field-help">
+              Don't have a key? Get one for free at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>.
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label for="gemini-model-select">Model Selection</label>
+            <select id="gemini-model-select" onchange="handleModelChange()">
+              <option value="gemini-flash-lite-latest" selected>gemini-flash-lite-latest (Fast & Recommended)</option>
+              <option value="gemini-flash-latest">gemini-flash-latest</option>
+              <option value="gemini-pro-latest">gemini-pro-latest (High Intelligence)</option>
+              <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+              <option value="gemini-2.5-pro">gemini-2.5-pro</option>
+            </select>
+          </div>
+
+          <!-- Connection test indicator -->
+          <div id="test-connection-result" class="test-result-box hidden"></div>
+
+          <div class="modal-actions">
+            <button type="button" id="test-key-btn" class="btn btn-outline" onclick="testGeminiConnection()">
+              <span id="test-btn-spinner" class="btn-spinner hidden"></span>
+              <span id="test-btn-text">Test Key</span>
+            </button>
+            <div class="actions-right">
+              <button type="button" class="btn btn-danger-outline" onclick="clearApiKey()">Clear Key</button>
+              <button type="submit" class="btn btn-primary">Save Settings</button>
+            </div>
+          </div>
+        </form>
+
+        <hr class="modal-divider">
+
+        <div class="settings-data-section">
+          <h4>Sample Complaints & Local Storage</h4>
+          <p class="text-muted">Restore the 5 default sample complaints (pothole, overflowing garbage, broken streetlight, water leak, damaged road).</p>
+          <button type="button" class="btn btn-secondary" onclick="restoreSampleData()">
+            Reload 5 Sample Complaints
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================================================== -->
+  <!-- COMPLAINT DETAIL & AI REPORT MODAL                  -->
+  <!-- ==================================================== -->
+  <div id="detail-modal" class="modal-backdrop hidden" onclick="handleModalBackdropClick(event, 'detail-modal')">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span id="detail-modal-id" class="code-badge">#CR-0000</span>
+          <h3 id="detail-modal-title">Complaint Title</h3>
+        </div>
+        <button class="modal-close-btn" onclick="closeDetailModal()">&times;</button>
+      </div>
+
+      <div class="modal-body" id="detail-modal-body">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Friendly Toast Notification Stack -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- Photo Lightbox -->
+  <div id="photo-lightbox" class="lightbox-backdrop hidden" onclick="closeLightbox()">
+    <button class="lightbox-close" onclick="closeLightbox()" aria-label="Close photo">&times;</button>
+    <div class="lightbox-inner" onclick="event.stopPropagation()">
+      <img id="lightbox-img" class="lightbox-img" src="" alt="Full-size complaint photo">
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
